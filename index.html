@@ -6,8 +6,595 @@
     <title>Таблиця даних</title>
     <link rel="icon" href="https://jen9-ops.github.io/Note/icon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link rel="stylesheet" href="https://jen9-ops.github.io/library/style.css">
-    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 2em;
+            font-weight: 600;
+        }
+
+        .main-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .main-controls button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
+            background-color: #6c757d;
+            color: white;
+            
+            /* Нові стилі для кнопки "Старт" */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Нові стилі для кнопки "Старт" - зменшення розміру та центрування іконки */
+        .main-controls button#start {
+            padding: 12px;
+            width: 50px;
+            height: 50px;
+            box-sizing: border-box;
+            background-color: #28a745;
+        }
+        
+        /* Стиль для іконок у кнопках */
+        .main-controls button i,
+        .action-buttons button i,
+        .action-buttons label i {
+            margin-right: 8px;
+        }
+        
+        /* Прибираємо margin у іконки "Старт", бо тексту немає */
+        .main-controls button#start i {
+            margin: 0;
+        }
+
+        .main-controls button:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        .main-controls button#start:hover {
+            background-color: #218838;
+        }
+
+        /* Анімація для мікрофона */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                color: white;
+            }
+            50% {
+                transform: scale(1.1);
+                color: #ff4d4d; /* Червоний колір для "запису" */
+            }
+            100% {
+                transform: scale(1);
+                color: white;
+            }
+        }
+
+        .main-controls button#start.listening .fa-microphone {
+            animation: pulse 1.5s infinite;
+        }
+        
+        /* Стилі для індикаторів */
+        .speech-indicators {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dot { 
+            width: 10px; 
+            height: 10px; 
+            border-radius: 50%; 
+            background: #9aa3b2; 
+        }
+
+        .dot.live { 
+            background: #e23a3a; 
+            box-shadow: 0 0 0 4px rgba(226, 58, 58, 0.15); 
+        }
+
+        .status { 
+            font-size: 13px; 
+            color: #333; 
+        }
+
+        .warn { 
+            margin-top: 8px; 
+            font-size: 13px; 
+            color: #b91c1c; 
+        }
+
+        .ok { 
+            color: #0b7a2a; 
+        }
+
+
+        .stats-block {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        .stats-block span {
+            color: #007bff;
+        }
+        
+        .search-control {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .search-control input {
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            width: 300px;
+            font-size: 16px;
+        }
+
+        #dataForm {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr) auto;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        #dataForm input {
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .add-btn {
+            padding: 10px 15px;
+            background-color: #17a2b8;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .add-btn:hover {
+            background-color: #138496;
+            transform: scale(1.05);
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .action-buttons button, .action-buttons label {
+            padding: 10px 15px;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .action-buttons button.primary, .action-buttons label.primary {
+            background-color: #007bff;
+        }
+        .action-buttons button.primary:hover, .action-buttons label.primary:hover {
+            background-color: #0056b3;
+        }
+        .action-buttons button.danger {
+            background-color: #dc3545;
+        }
+        .action-buttons button.danger:hover {
+            background-color: #c82333;
+        }
+        .action-buttons button.warning {
+            background-color: #ffc107;
+            color: #212529;
+            font-weight: bold;
+        }
+        .action-buttons button.warning:hover {
+            background-color: #e0a800;
+        }
+        .action-buttons button.success {
+            background-color: #28a745;
+        }
+        .action-buttons button.success:hover {
+            background-color: #218838;
+        }
+        .action-buttons button.secondary {
+            background-color: #6c757d;
+        }
+        .action-buttons button.secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        button:disabled {
+            background-color: #ccc !important;
+            cursor: not-allowed !important;
+            transform: none !important;
+        }
+
+        #newTargetControl {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+
+        #newTargetInput, #coordsInput {
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            width: 100%;
+            max-width: 300px;
+            box-sizing: border-box;
+        }
+        
+        #newTargetInput::placeholder, #coordsInput::placeholder {
+            font-style: italic;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+        }
+
+        th, td {
+            border: 1px solid #e0e0e0;
+            padding: 15px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9fa;
+        }
+        
+        .highlight-yellow {
+            background-color: #fff3cd;
+        }
+        .highlight-orange {
+            background-color: #ffe4b2;
+        }
+        
+        .section-divider {
+            border-top: 2px solid #007bff;
+            margin: 25px 0;
+            text-align: center;
+            position: relative;
+        }
+        
+        .divider-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 0 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .divider-text, .divider-input {
+            color: #4a4a4a;
+            font-weight: bold;
+        }
+
+        .divider-input {
+            font-size: 1em;
+            width: auto;
+            text-align: center;
+            border: 1px solid #007bff;
+            border-radius: 4px;
+        }
+
+        .divider-coords {
+            font-size: 0.9em;
+            color: #555;
+            font-style: italic;
+        }
+
+        .shift-header {
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #dc3545;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0;
+            margin-left: 10px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close-btn:hover,
+        .close-btn:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        .modal .action-buttons {
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .modal .action-buttons button, .modal .action-buttons label {
+            width: 100%;
+        }
+        
+        .modal .shift-control {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .modal .shift-control button {
+            width: 48%;
+            background-color: #e9ecef;
+            color: #495057;
+        }
+        .modal .shift-control button.active {
+            background-color: #007bff;
+            color: white;
+        }
+        .modal .shift-control button:hover {
+            background-color: #dee2e6;
+        }
+        .modal .shift-control button.active:hover {
+            background-color: #0056b3;
+        }
+
+        /* Стилі для калькулятора */
+        #calculatorModal .modal-content {
+            max-width: 300px;
+        }
+        .calc-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        .calc-buttons {
+            display: flex;
+            justify-content: space-around;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .calc-buttons button {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.5em;
+            font-weight: bold;
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        #calcResult {
+            font-size: 2em;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        /* Стилі для випадаючого меню */
+        .take-value-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            z-index: 10;
+            padding: 5px;
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .take-value-menu button {
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            color: #333;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .take-value-menu button:hover {
+            background-color: #e0e0e0;
+        }
+        /* Стилі для кнопок запису результату */
+        .write-back-buttons {
+            display: none;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .write-back-buttons button {
+            padding: 8px 12px;
+            font-size: 1em;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .write-back-buttons button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Адаптивність */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            #dataForm {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons, .modal .action-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .action-buttons > div {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .action-buttons input,
+            .action-buttons button,
+            .action-buttons label {
+                width: 100%;
+                box-sizing: border-box;
+            }
+            
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+
+            thead {
+                display: none;
+            }
+
+            tr {
+                border: 1px solid #e0e0e0;
+                margin-bottom: 15px;
+                display: block;
+                padding: 15px;
+                border-radius: 8px;
+                background-color: #fff;
+            }
+
+            td {
+                border: none;
+                position: relative;
+                padding-left: 50%;
+                text-align: right;
+            }
+            
+            td:last-child {
+                display: flex;
+                justify-content: flex-end;
+                align-items: center;
+            }
+
+            td:before {
+                content: attr(data-label);
+                position: absolute;
+                left: 10px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                text-align: left;
+                font-weight: bold;
+                color: #555;
+            }
+
+            .stats-block {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
 
@@ -22,10 +609,10 @@
         </div>
         
         <div class="speech-indicators">
-           
+            <div id="dot" class="dot" title="Індикатор запису"></div>
             <span id="status" class="status">Не слухаю</span>
         </div>
-        
+        <div id="warn" class="warn"></div>
         
         <div class="stats-block">
             <span>Загалом пострілів: <span id="totalShotsDisplay">0</span></span>
@@ -125,8 +712,968 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="https://jen9-ops.github.io/library/script.js"></script>
-    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const chesterShiftBtn = document.getElementById('chesterShiftBtn');
+            const kozakShiftBtn = document.getElementById('kozakShiftBtn');
+            const settingsBtn = document.getElementById('settingsBtn');
+            const calculatorBtn = document.getElementById('calculatorBtn');
+            const settingsModal = document.getElementById('settingsModal');
+            const calculatorModal = document.getElementById('calculatorModal');
+            const closeSettingsBtn = settingsModal.querySelector('.close-btn');
+            const closeCalcBtn = document.getElementById('closeCalcBtn');
+            const searchInput = document.getElementById('searchInput');
+            const dataForm = document.getElementById('dataForm');
+            const rivenInput = document.getElementById('riven');
+            const dalnistInput = document.getElementById('dalnist');
+            const kutInput = document.getElementById('kut');
+            const newTargetBtn = document.getElementById('newTargetBtn');
+            const newTargetInput = document.getElementById('newTargetInput');
+            const coordsInput = document.getElementById('coordsInput');
+            const shotBtn = document.getElementById('shotBtn');
+            const undoShotBtn = document.getElementById('undoShotBtn');
+            const tableContainer = document.getElementById('table-container');
+            const ammoInput = document.getElementById('ammoInput');
+            const setAmmoBtn = document.getElementById('setAmmoBtn');
+            const totalShotsDisplay = document.getElementById('totalShotsDisplay');
+            const remainingAmmoDisplay = document.getElementById('remainingAmmoDisplay');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const downloadZipBtn = document.getElementById('downloadZipBtn');
+            const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+            const uploadInput = document.getElementById('uploadInput');
+            const clearAllDataBtn = document.getElementById('clearAllDataBtn');
+            const calcInput1 = document.getElementById('calcInput1');
+            const calcInput2 = document.getElementById('calcInput2');
+            const calcAddBtn = document.getElementById('calcAddBtn');
+            const calcSubtractBtn = document.getElementById('calcSubtractBtn');
+            const calcResult = document.getElementById('calcResult');
+            const takeValueMenu = document.getElementById('takeValueMenu');
+            const takeRivenBtn = document.getElementById('takeRivenBtn');
+            const takeDalnistBtn = document.getElementById('takeDalnistBtn');
+            const takeKutBtn = document.getElementById('takeKutBtn');
+            const writeBackButtons = document.getElementById('writeBackButtons');
+            const writeToRivenBtn = document.getElementById('writeToRivenBtn');
+            const writeToDalnistBtn = document.getElementById('writeToDalnistBtn');
+            const writeToKutBtn = document.getElementById('writeToKutBtn');
+
+            let currentShift = localStorage.getItem('currentShift') || 'Козак';
+            const shiftsData = JSON.parse(localStorage.getItem('shiftsData')) || {};
+            
+            let currentAmmo = parseInt(localStorage.getItem(`${currentShift}-ammo`)) || 0;
+            let lastShotTime = null;
+            
+            const COORDS_PREFIX = "37U DQ ";
+            
+            coordsInput.addEventListener('input', (event) => {
+                const input = event.target;
+                const value = input.value;
+                const cursorPosition = input.selectionStart;
+
+                if (!value.startsWith(COORDS_PREFIX)) {
+                    input.value = COORDS_PREFIX;
+                    return;
+                }
+                
+                const rawCoords = value.substring(COORDS_PREFIX.length).replace(/[^0-9]/g, '');
+                const formattedCoords = rawCoords.slice(0, 5) + (rawCoords.length > 5 ? ' ' + rawCoords.slice(5, 10) : '');
+                
+                input.value = COORDS_PREFIX + formattedCoords;
+                
+                const newCursorPosition = COORDS_PREFIX.length + formattedCoords.length;
+                input.setSelectionRange(newCursorPosition, newCursorPosition);
+            });
+            
+            coordsInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Backspace' && coordsInput.value === COORDS_PREFIX) {
+                    event.preventDefault();
+                }
+            });
+
+            const updateShiftButtons = () => {
+                chesterShiftBtn.classList.remove('active');
+                kozakShiftBtn.classList.remove('active');
+                if (currentShift === 'Честер') {
+                    chesterShiftBtn.classList.add('active');
+                } else {
+                    kozakShiftBtn.classList.add('active');
+                }
+            };
+            
+            const updateTotalStats = () => {
+                let totalShots = 0;
+                if (shiftsData[currentShift]) {
+                    shiftsData[currentShift].forEach(item => {
+                        if (item.isTable && item.content) {
+                            item.content.forEach(row => {
+                                if (row.shotCount) {
+                                    totalShots += parseInt(row.shotCount);
+                                }
+                            });
+                        }
+                    });
+                }
+                totalShotsDisplay.textContent = totalShots;
+                remainingAmmoDisplay.textContent = currentAmmo;
+            };
+
+            const updateAmmoDisplay = () => {
+                shotBtn.disabled = currentAmmo <= 0;
+                updateTotalStats();
+            };
+
+            const saveData = () => {
+                const data = [];
+                const tableElements = tableContainer.children;
+                for (let i = 0; i < tableElements.length; i++) {
+                    const element = tableElements[i];
+                    if (element.tagName === 'TABLE') {
+                        const tableData = [];
+                        element.querySelectorAll('tbody tr').forEach(row => {
+                            const rivenEl = row.querySelector('td[data-label="Рівень"]');
+                            const dalnistEl = row.querySelector('td[data-label="Дальність"]');
+                            const kutEl = row.querySelector('td[data-label="Кут"]');
+                            const shotCountEl = row.querySelector('td[data-label="Кількість пострілів"]');
+                            const ammoLeftEl = row.querySelector('td[data-label="Залишок б/к"]');
+                            const timeDateEl = row.querySelector('td[data-label="Час пострілу"]');
+                            const timeBetweenShotsEl = row.querySelector('td[data-label="Час між пострілами"]');
+
+                            const rowData = {
+                                riven: rivenEl ? rivenEl.textContent : '',
+                                dalnist: dalnistEl ? dalnistEl.textContent : '',
+                                kut: kutEl ? kutEl.textContent : '',
+                                shotCount: shotCountEl ? shotCountEl.textContent : '',
+                                ammoLeft: ammoLeftEl ? ammoLeftEl.textContent : '',
+                                timeDate: timeDateEl ? timeDateEl.textContent : '',
+                                timeBetween: timeBetweenShotsEl ? timeBetweenShotsEl.textContent : ''
+                            };
+                            tableData.push(rowData);
+                        });
+                        data.push({ isTable: true, content: tableData });
+                    } else if (element.classList.contains('section-divider')) {
+                        const dividerTextEl = element.querySelector('.divider-text');
+                        const dividerCoordsEl = element.querySelector('.divider-coords');
+                        if (dividerTextEl) {
+                           const dividerText = dividerTextEl.textContent;
+                           const dividerCoords = dividerCoordsEl ? dividerCoordsEl.textContent : '';
+                           data.push({ isDivider: true, text: dividerText, coords: dividerCoords });
+                        }
+                    }
+                }
+                shiftsData[currentShift] = data;
+                localStorage.setItem('shiftsData', JSON.stringify(shiftsData));
+                localStorage.setItem('currentShift', currentShift);
+                localStorage.setItem(`${currentShift}-ammo`, currentAmmo);
+            };
+
+            const loadData = (data = shiftsData[currentShift] || []) => {
+                tableContainer.innerHTML = '';
+                const shiftHeader = document.createElement('div');
+                shiftHeader.classList.add('shift-header');
+                shiftHeader.textContent = `Поточна зміна: ${currentShift}`;
+                tableContainer.appendChild(shiftHeader);
+                
+                let totalShotsForShift = 0;
+
+                data.forEach(item => {
+                    if (item.isTable) {
+                        const newTable = document.createElement('table');
+                        newTable.id = 'dataTable';
+                        newTable.innerHTML = `
+                            <thead>
+                                <tr>
+                                    <th>Рівень</th>
+                                    <th>Дальність</th>
+                                    <th>Кут</th>
+                                    <th>Кількість пострілів</th>
+                                    <th>Залишок б/к</th>
+                                    <th>Час пострілу</th>
+                                    <th>Час між пострілами</th>
+                                    <th>Дії</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        `;
+                        const tableBody = newTable.querySelector('tbody');
+                        let currentShotCount = 0;
+                        item.content.forEach(rowData => {
+                            if (rowData.riven) {
+                                currentShotCount = 0;
+                            }
+                            currentShotCount += parseInt(rowData.shotCount);
+                            appendRow(rowData, tableBody, currentShotCount);
+                        });
+                        tableContainer.appendChild(newTable);
+                    } else if (item.isDivider) {
+                        appendDivider(item.text, item.coords);
+                    }
+                });
+
+                if (data.length === 0 || !data.some(item => item.isTable)) {
+                    const newTable = document.createElement('table');
+                    newTable.id = 'dataTable';
+                    newTable.innerHTML = `
+                        <thead>
+                            <tr>
+                                <th>Рівень</th>
+                                <th>Дальність</th>
+                                <th>Кут</th>
+                                <th>Кількість пострілів</th>
+                                <th>Залишок б/к</th>
+                                <th>Час пострілу</th>
+                                <th>Час між пострілами</th>
+                                <th>Дії</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    `;
+                    tableContainer.appendChild(newTable);
+                }
+
+                updateTotalStats();
+                updateAmmoDisplay();
+                updateLastShotTime();
+                makeDividersEditable();
+            };
+            
+            const appendRow = (rowData, targetBody, currentShotCount) => {
+                const newRow = document.createElement('tr');
+                if (currentShotCount > 5 && currentShotCount <= 10) {
+                    newRow.classList.add('highlight-yellow');
+                } else if (currentShotCount > 10) {
+                    newRow.classList.add('highlight-orange');
+                }
+
+                newRow.innerHTML = `
+                    <td data-label="Рівень">${rowData.riven}</td>
+                    <td data-label="Дальність">${rowData.dalnist}</td>
+                    <td data-label="Кут">${rowData.kut}</td>
+                    <td data-label="Кількість пострілів">${rowData.shotCount}</td>
+                    <td data-label="Залишок б/к">${rowData.ammoLeft}</td>
+                    <td data-label="Час пострілу">${rowData.timeDate}</td>
+                    <td data-label="Час між пострілами">${rowData.timeBetween}</td>
+                    <td data-label="Дії">
+                        <button class="delete-btn" title="Видалити запис">&times;</button>
+                    </td>
+                `;
+                targetBody.appendChild(newRow);
+                
+                newRow.querySelector('.delete-btn').addEventListener('click', (e) => {
+                    const rowToDelete = e.target.closest('tr');
+                    const isFirstShot = rowToDelete.querySelector('td[data-label="Рівень"]').textContent.trim() !== '';
+                    const isLastRow = rowToDelete === targetBody.lastElementChild;
+                    
+                    if (isFirstShot) {
+                        alert('Не можна видалити перший запис у цілі. Створіть нову ціль, щоб почати з чистого листа.');
+                        return;
+                    }
+                    
+                    if (isLastRow) {
+                        const shotCount = parseInt(rowToDelete.querySelector('td[data-label="Кількість пострілів"]').textContent);
+                        currentAmmo += shotCount;
+                    }
+                    
+                    rowToDelete.remove();
+                    updateAmmoDisplay();
+                    saveData();
+                });
+            };
+
+            const appendDivider = (text = '', coords = '') => {
+                const divider = document.createElement('div');
+                divider.classList.add('section-divider');
+                
+                const dividerContent = document.createElement('div');
+                dividerContent.classList.add('divider-content');
+
+                const dividerText = document.createElement('span');
+                dividerText.classList.add('divider-text');
+                
+                let displayText = text;
+                if (!displayText.includes('Ціль:')) {
+                    displayText = text ? `Ціль: ${text}` : 'Нова ціль';
+                }
+                dividerText.textContent = `${displayText}`;
+
+                const dividerCoords = document.createElement('span');
+                dividerCoords.classList.add('divider-coords');
+                dividerCoords.textContent = coords;
+
+                dividerContent.appendChild(dividerText);
+                if (coords) {
+                   dividerContent.appendChild(dividerCoords);
+                }
+                
+                divider.appendChild(dividerContent);
+                tableContainer.appendChild(divider);
+                
+                const newTable = document.createElement('table');
+                newTable.id = 'dataTable';
+                newTable.innerHTML = `
+                    <thead>
+                        <tr>
+                            <th>Рівень</th>
+                            <th>Дальність</th>
+                            <th>Кут</th>
+                            <th>Кількість пострілів</th>
+                            <th>Залишок б/к</th>
+                            <th>Час пострілу</th>
+                            <th>Час між пострілами</th>
+                            <th>Дії</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                `;
+                tableContainer.appendChild(newTable);
+                makeDividersEditable();
+            };
+
+            const updateLastShotTime = () => {
+                const allRows = document.querySelectorAll('#table-container tbody tr');
+                if (allRows.length > 0) {
+                    const lastRow = allRows[allRows.length - 1];
+                    const timeCell = lastRow.querySelector('td[data-label="Час пострілу"]');
+                    if (timeCell && timeCell.textContent) {
+                        try {
+                           const [datePart, timePart] = timeCell.textContent.split(' ');
+                           const [day, month, year] = datePart.split('.');
+                           const [hours, minutes, seconds] = timePart.split(':');
+                           lastShotTime = new Date(year, month - 1, day, hours, minutes, seconds);
+                        } catch (e) {
+                           lastShotTime = null;
+                        }
+                    } else {
+                        lastShotTime = null;
+                    }
+                } else {
+                    lastShotTime = null;
+                }
+            };
+            
+            const makeDividersEditable = () => {
+                document.querySelectorAll('.section-divider').forEach(divider => {
+                    divider.removeEventListener('dblclick', handleDividerDblClick);
+                    divider.addEventListener('dblclick', handleDividerDblClick);
+                });
+            };
+
+            const handleDividerDblClick = (event) => {
+                const divider = event.currentTarget;
+                const textSpan = divider.querySelector('.divider-text');
+                if (!textSpan) return;
+                
+                if (divider.querySelector('.divider-input')) {
+                   return;
+                }
+
+                const currentText = textSpan.textContent.replace('Ціль: ', '');
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'divider-input';
+                input.value = currentText;
+
+                const dividerContent = divider.querySelector('.divider-content');
+                dividerContent.replaceChild(input, textSpan);
+                input.focus();
+
+                const finishEdit = () => {
+                    const newText = input.value.trim();
+                    const newSpan = document.createElement('span');
+                    newSpan.className = 'divider-text';
+                    newSpan.textContent = `Ціль: ${newText}`;
+                    
+                    if (dividerContent.contains(input)) {
+                        dividerContent.replaceChild(newSpan, input);
+                    }
+                    
+                    const dividerIndex = Array.from(tableContainer.children).indexOf(divider);
+                    if (dividerIndex !== -1 && shiftsData[currentShift][dividerIndex - 1]) {
+                        shiftsData[currentShift][dividerIndex - 1].text = newSpan.textContent;
+                        saveData();
+                    }
+                    makeDividersEditable();
+                };
+
+                input.addEventListener('blur', finishEdit);
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        finishEdit();
+                    }
+                });
+            };
+            
+            chesterShiftBtn.addEventListener('click', () => {
+                saveData();
+                currentShift = 'Честер';
+                currentAmmo = parseInt(localStorage.getItem(`${currentShift}-ammo`)) || 0;
+                loadData();
+                updateShiftButtons();
+            });
+
+            kozakShiftBtn.addEventListener('click', () => {
+                saveData();
+                currentShift = 'Козак';
+                currentAmmo = parseInt(localStorage.getItem(`${currentShift}-ammo`)) || 0;
+                loadData();
+                updateShiftButtons();
+            });
+
+            settingsBtn.addEventListener('click', () => {
+                settingsModal.style.display = 'block';
+                updateShiftButtons();
+            });
+
+            calculatorBtn.addEventListener('click', () => {
+                calculatorModal.style.display = 'block';
+                calcResult.textContent = '0';
+                calcInput1.value = '';
+                calcInput2.value = '';
+                writeBackButtons.style.display = 'none';
+            });
+
+            closeSettingsBtn.addEventListener('click', () => {
+                settingsModal.style.display = 'none';
+            });
+
+            closeCalcBtn.addEventListener('click', () => {
+                calculatorModal.style.display = 'none';
+            });
+
+            window.addEventListener('click', (event) => {
+                if (event.target === settingsModal) {
+                    settingsModal.style.display = 'none';
+                }
+                if (event.target === calculatorModal) {
+                    calculatorModal.style.display = 'none';
+                }
+            });
+
+            setAmmoBtn.addEventListener('click', () => {
+                const value = parseInt(ammoInput.value);
+                if (!isNaN(value) && value >= 0) {
+                    currentAmmo = value;
+                    updateAmmoDisplay();
+                    saveData();
+                    alert('Кількість б/к оновлено!');
+                    settingsModal.style.display = 'none';
+                } else {
+                    alert('Будь ласка, введіть коректне число для б/к.');
+                }
+            });
+            
+            uploadInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = async (event) => {
+                    try {
+                        let loadedData = {};
+                        if (file.name.endsWith('.zip')) {
+                           const zip = await JSZip.loadAsync(event.target.result);
+                           const jsonFile = zip.file('data.json');
+                           if (jsonFile) {
+                              const jsonContent = await jsonFile.async('string');
+                              loadedData = JSON.parse(jsonContent);
+                           } else {
+                              alert('У ZIP-файлі не знайдено файл data.json.');
+                              return;
+                           }
+                        } else {
+                            loadedData = JSON.parse(event.target.result);
+                        }
+
+                        if (loadedData.shiftsData) {
+                            Object.assign(shiftsData, loadedData.shiftsData);
+                            localStorage.setItem('shiftsData', JSON.stringify(shiftsData));
+                            
+                            if (loadedData.ammoData) {
+                                ['Козак', 'Честер'].forEach(shift => {
+                                    if (loadedData.ammoData[`${shift}-ammo`] !== null && loadedData.ammoData[`${shift}-ammo`] !== undefined) {
+                                        localStorage.setItem(`${shift}-ammo`, loadedData.ammoData[`${shift}-ammo`]);
+                                    }
+                                });
+                            }
+                            
+                            currentShift = localStorage.getItem('currentShift') || 'Козак';
+                            currentAmmo = parseInt(localStorage.getItem(`${currentShift}-ammo`)) || 0;
+                            loadData();
+                            updateShiftButtons();
+                            alert('Дані успішно завантажено!');
+                            settingsModal.style.display = 'none';
+                        } else {
+                            alert('Некоректний формат файлу. Будь ласка, виберіть файл з даними.');
+                        }
+                    } catch (error) {
+                        alert('Помилка при читанні файлу. Переконайтесь, що це коректний JSON-файл або ZIP-архів з файлом data.json.');
+                    }
+                };
+                if (file.name.endsWith('.zip')) {
+                   reader.readAsArrayBuffer(file);
+                } else {
+                   reader.readAsText(file);
+                }
+            });
+            
+            downloadBtn.addEventListener('click', () => {
+                const dataToSave = {
+                    shiftsData: shiftsData,
+                    ammoData: {
+                        'Козак-ammo': localStorage.getItem('Козак-ammo'),
+                        'Честер-ammo': localStorage.getItem('Честер-ammo')
+                    }
+                };
+                const jsonData = JSON.stringify(dataToSave, null, 2);
+                const blob = new Blob([jsonData], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `дані-${new Date().toISOString().slice(0, 10)}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+            
+            downloadZipBtn.addEventListener('click', async () => {
+                const zip = new JSZip();
+                const dataToSave = {
+                    shiftsData: shiftsData,
+                    ammoData: {
+                        'Козак-ammo': localStorage.getItem('Козак-ammo'),
+                        'Честер-ammo': localStorage.getItem('Честер-ammo')
+                    }
+                };
+                const jsonData = JSON.stringify(dataToSave, null, 2);
+                zip.file('data.json', jsonData);
+                
+                const blob = await zip.generateAsync({ type: 'blob' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `дані-${new Date().toISOString().slice(0, 10)}.zip`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+            
+            downloadPdfBtn.addEventListener('click', () => {
+                const element = document.getElementById('table-container');
+
+                if (!element || element.children.length <= 1) {
+                    alert('Немає даних для збереження в PDF.');
+                    return;
+                }
+
+                const options = {
+                    margin: [10, 10, 10, 10],
+                    filename: `дані-${new Date().toISOString().slice(0, 10)}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+
+                html2pdf().from(element).set(options).save();
+            });
+
+            clearAllDataBtn.addEventListener('click', () => {
+                const confirmed = confirm('Ви впевнені, що хочете видалити всі дані? Цю дію неможливо скасувати.');
+                if (confirmed) {
+                    localStorage.removeItem('shiftsData');
+                    localStorage.removeItem('Козак-ammo');
+                    localStorage.removeItem('Честер-ammo');
+                    location.reload();
+                }
+            });
+
+            dataForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const riven = rivenInput.value.trim();
+                const dalnist = dalnistInput.value.trim();
+                const kut = kutInput.value.trim();
+
+                if (riven && dalnist && kut) {
+                    const now = new Date();
+                    const formattedDate = `${String(now.getDate()).padStart(2, '0')}.${String(now.getMonth() + 1).padStart(2, '0')}.${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+                    
+                    const newRowData = { riven, dalnist, kut, shotCount: '0', ammoLeft: currentAmmo, timeDate: formattedDate, timeBetween: '' };
+                    const lastTableBody = document.querySelector('#table-container table:last-child tbody');
+                    if (lastTableBody) {
+                       appendRow(newRowData, lastTableBody, 0);
+                       saveData();
+                       dataForm.reset();
+                       updateAmmoDisplay();
+                    } else {
+                       alert('Помилка: Не вдалося знайти таблицю для додавання даних. Створіть нову ціль.');
+                    }
+                }
+            });
+
+            undoShotBtn.addEventListener('click', () => {
+                const lastTableBody = document.querySelector('#table-container table:last-child tbody');
+                if (lastTableBody) {
+                    const rows = lastTableBody.querySelectorAll('tr');
+                    if (rows.length > 0) {
+                        const lastRow = rows[rows.length - 1];
+                        const lastShotCount = parseInt(lastRow.querySelector('td[data-label="Кількість пострілів"]').textContent);
+                        
+                        if (lastShotCount === 1 && !lastRow.querySelector('td[data-label="Рівень"]').textContent.trim()) {
+                            currentAmmo++;
+                            lastTableBody.removeChild(lastRow);
+                            updateAmmoDisplay();
+                            saveData();
+                            updateLastShotTime();
+                        } else {
+                           alert('Відмінити можна тільки останній постріл. Щоб видалити інший, скористайтесь кнопкою "Видалити".');
+                        }
+                    }
+                }
+            });
+
+            newTargetBtn.addEventListener('click', () => {
+                const riven = rivenInput.value.trim();
+                const dalnist = dalnistInput.value.trim();
+                const kut = kutInput.value.trim();
+                const targetNumber = newTargetInput.value.trim();
+                const coordsValue = coordsInput.value.trim();
+                
+                const lastTableBody = document.querySelector('#table-container table:last-child tbody');
+                
+                if (lastTableBody && lastTableBody.children.length > 0) {
+                    appendDivider(targetNumber, coordsValue);
+                    saveData();
+                } else if (!lastTableBody && shiftsData[currentShift] && shiftsData[currentShift].length > 0) {
+                   appendDivider(targetNumber, coordsValue);
+                   saveData();
+                } else {
+                   alert('Щоб створити нову ціль, додайте хоча б один запис.');
+                }
+                newTargetInput.value = '';
+                coordsInput.value = COORDS_PREFIX;
+                updateLastShotTime();
+            });
+
+            shotBtn.addEventListener('click', async () => {
+                if (shotBtn.disabled) return;
+
+                const lastTableBody = document.querySelector('#table-container table:last-child tbody');
+                if (!lastTableBody || lastTableBody.children.length === 0) {
+                    alert('Спочатку додайте дані, перш ніж робити постріл.');
+                    return;
+                }
+                
+                const newRiven = rivenInput.value.trim();
+                const newDalnist = dalnistInput.value.trim();
+                const newKut = kutInput.value.trim();
+
+                let finalRiven = newRiven;
+                let finalDalnist = newDalnist;
+                let finalKut = newKut;
+                
+                if (newRiven === '' && newDalnist === '' && newKut === '') {
+                    const allRows = document.querySelectorAll('#table-container tbody tr');
+                    for (let i = allRows.length - 1; i >= 0; i--) {
+                        const row = allRows[i];
+                        const rowRiven = row.querySelector('td[data-label="Рівень"]').textContent.trim();
+                        const rowDalnist = row.querySelector('td[data-label="Дальність"]').textContent.trim();
+                        const rowKut = row.querySelector('td[data-label="Кут"]').textContent.trim();
+                        
+                        if (rowRiven !== '' && rowDalnist !== '' && rowKut !== '') {
+                            finalRiven = rowRiven;
+                            finalDalnist = rowDalnist;
+                            finalKut = rowKut;
+                            break;
+                        }
+                    }
+                }
+                
+                if (currentAmmo > 0) {
+                    currentAmmo--;
+                    
+                    const now = new Date();
+                    const formattedDate = `${String(now.getDate()).padStart(2, '0')}.${String(now.getMonth() + 1).padStart(2, '0')}.${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+                    
+                    let timeBetween = '';
+                    if (lastShotTime) {
+                        const diffInSeconds = Math.floor((now - lastShotTime) / 1000);
+                        const minutes = Math.floor(diffInSeconds / 60);
+                        const seconds = diffInSeconds % 60;
+                        timeBetween = `${minutes} хв ${seconds} с`;
+                    }
+                    
+                    const newRowData = {
+                        riven: finalRiven,
+                        dalnist: finalDalnist,
+                        kut: finalKut,
+                        shotCount: '1',
+                        ammoLeft: currentAmmo,
+                        timeDate: formattedDate,
+                        timeBetween: timeBetween
+                    };
+
+                    const lastRow = lastTableBody.lastElementChild;
+                    let currentShotCount = 1;
+                    if (lastRow) {
+                       const shotCountCell = lastRow.querySelector('td[data-label="Кількість пострілів"]');
+                       if (shotCountCell && !lastRow.querySelector('td[data-label="Рівень"]').textContent.trim()) {
+                            currentShotCount += parseInt(shotCountCell.textContent);
+                       }
+                    }
+
+                    appendRow(newRowData, lastTableBody, currentShotCount);
+                    updateLastShotTime();
+                    updateAmmoDisplay();
+                    saveData();
+                }
+            });
+            
+            searchInput.addEventListener('input', () => {
+                const filter = searchInput.value.trim().toLowerCase();
+                const elements = Array.from(tableContainer.children);
+                let isDividerFound = false;
+            
+                elements.forEach((element) => {
+                    if (element.classList.contains('shift-header')) {
+                        element.style.display = '';
+                    } else if (element.classList.contains('section-divider')) {
+                        const dividerText = element.querySelector('.divider-text').textContent.toLowerCase();
+                        if (filter === '' || dividerText.includes(filter)) {
+                            element.style.display = '';
+                            isDividerFound = true;
+                        } else {
+                            element.style.display = 'none';
+                            isDividerFound = false;
+                        }
+                    } else if (element.tagName === 'TABLE') {
+                        if (isDividerFound || filter === '') {
+                            element.style.display = '';
+                        } else {
+                            element.style.display = 'none';
+                        }
+                        isDividerFound = false;
+                    }
+                });
+            });
+
+            const calculate = (operator) => {
+                const num1 = parseFloat(calcInput1.value);
+                const num2 = parseFloat(calcInput2.value);
+
+                if (isNaN(num1) || isNaN(num2)) {
+                    calcResult.textContent = 'Помилка';
+                    writeBackButtons.style.display = 'none';
+                    return;
+                }
+
+                let result;
+                if (operator === '+') {
+                    result = num1 + num2;
+                } else if (operator === '-') {
+                    result = num1 - num2;
+                }
+
+                calcResult.textContent = result;
+                writeBackButtons.style.display = 'flex';
+            };
+
+            calcAddBtn.addEventListener('click', () => calculate('+'));
+            calcSubtractBtn.addEventListener('click', () => calculate('-'));
+
+            calcInput1.addEventListener('focus', () => {
+                takeValueMenu.style.display = 'flex';
+            });
+            
+            calcInput1.addEventListener('blur', (e) => {
+                setTimeout(() => {
+                    if (!e.relatedTarget || !takeValueMenu.contains(e.relatedTarget)) {
+                        takeValueMenu.style.display = 'none';
+                    }
+                }, 100);
+            });
+
+            takeRivenBtn.addEventListener('click', () => {
+                calcInput1.value = rivenInput.value;
+                takeValueMenu.style.display = 'none';
+            });
+            takeDalnistBtn.addEventListener('click', () => {
+                calcInput1.value = dalnistInput.value;
+                takeValueMenu.style.display = 'none';
+            });
+            takeKutBtn.addEventListener('click', () => {
+                calcInput1.value = kutInput.value;
+                takeValueMenu.style.display = 'none';
+            });
+
+            writeToRivenBtn.addEventListener('click', () => {
+                rivenInput.value = calcResult.textContent;
+                calculatorModal.style.display = 'none';
+            });
+            writeToDalnistBtn.addEventListener('click', () => {
+                dalnistInput.value = calcResult.textContent;
+                calculatorModal.style.display = 'none';
+            });
+            writeToKutBtn.addEventListener('click', () => {
+                kutInput.value = calcResult.textContent;
+                calculatorModal.style.display = 'none';
+            });
+
+
+// --- DOM елементи (кешуємо для швидкості)
+const startBtn = document.getElementById('start');
+const statusEl = document.getElementById('status');
+const dotEl = document.getElementById('dot');
+const warnEl = document.getElementById('warn');
+
+// --- Підтримка
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const secureOk = window.isSecureContext || ['localhost','127.0.0.1'].includes(location.hostname);
+
+function warn(msg, ok=false){ warnEl.textContent = msg; warnEl.classList.toggle('ok', ok); }
+function setUI(listening){ statusEl.textContent = listening ? 'Слухаю…' : 'Не слухаю'; dotEl.classList.toggle('live', listening); }
+
+if (!secureOk) warn('Відкрийте сторінку по HTTPS або через http://localhost (інакше мікрофон може бути заблокований).');
+if (!SR) { warn('Браузер не підтримує SpeechRecognition. Використайте Chrome або Edge.'); startBtn.disabled = true; }
+
+// --- Ключі (з урахуванням описок)
+const KEYWORDS = {
+  riven:    ['рівень','ривень'],
+  dalnist: ['дальність','дальнисть'],
+  kut:    ['кут'],
+  stop:   ['стоп', 'зупинись']
+};
+const ALL_KEYS = Object.values(KEYWORDS).flat();
+
+// --- Стан
+let rec = null;
+let wantListen = false;
+let running = false;
+let armed = null;
+
+function setupRecognition(){
+  if (rec) return rec;
+  rec = new SR();
+  rec.lang = 'uk-UA';
+  rec.continuous = true;
+  rec.interimResults = false;
+  rec.maxAlternatives = 1;
+
+  rec.onstart = () => { running = true; setUI(true); };
+  rec.onend   = () => {
+    running = false; setUI(false);
+    if (wantListen) setTimeout(safeStart, 250);
+  };
+  rec.onerror = (e) => {
+    if (e.error === 'not-allowed') { warn('Доступ до мікрофона заборонено. Дозвольте мікрофон для сайту.'); wantListen = false; }
+    if (e.error === 'no-speech' || e.error === 'aborted' || e.error === 'network') {
+      if (wantListen) setTimeout(safeStart, 300);
+    }
+  };
+  rec.onresult = (ev) => {
+    for (let i = ev.resultIndex; i < ev.results.length; i++) {
+      const res = ev.results[i];
+      if (!res.isFinal) continue;
+      const text = res[0].transcript.trim().toLowerCase();
+      handleTranscript(text);
+    }
+  };
+  return rec;
+}
+
+function extractNumber(str){
+  const m = str.match(/[-+]?\d+(?:[.,]\d+)?/);
+  return m ? m[0].replace(',', '.') : null;
+}
+
+function detectKey(str){
+  if (KEYWORDS.riven.some(k => str.includes(k))) return 'riven';
+  if (KEYWORDS.dalnist.some(k => str.includes(k))) return 'dalnist';
+  if (KEYWORDS.kut.some(k => str.includes(k))) return 'kut';
+  return null;
+}
+
+function onlyKeywords(str){
+  const tokens = str.split(/\s+/).filter(Boolean);
+  if (!tokens.length) return false;
+  return tokens.every(t => ALL_KEYS.includes(t));
+}
+
+function writeToField(which, num){
+  if (!num) return;
+  if (which === 'riven')    rivenInput.value = num;
+  if (which === 'dalnist') dalnistInput.value = num;
+  if (which === 'kut')    kutInput.value = num;
+}
+
+function handleTranscript(text){
+  if (KEYWORDS.stop.some(k => text.includes(k))) {
+    safeStop();
+    return;
+  }
+
+  if (onlyKeywords(text)){
+    const k = detectKey(text);
+    if (k) armed = k;
+    return;
+  }
+
+  if (armed){
+    const num = extractNumber(text);
+    if (num){
+      writeToField(armed, num);
+      armed = null;
+      return;
+    }
+    const k2 = detectKey(text);
+    if (k2){ armed = k2; }
+    return;
+  }
+
+  const k = detectKey(text);
+  const num = extractNumber(text);
+  if (k && num){
+    writeToField(k, num);
+    armed = null;
+    return;
+  }
+
+  if (k && !num){
+    armed = k;
+    return;
+  }
+}
+
+async function ensureMicPermission(){
+  try{
+    const st = await navigator.mediaDevices.getUserMedia({ audio:true });
+    st.getTracks().forEach(t=>t.stop());
+    warn('Мікрофон дозволено.', true);
+    return true;
+  }catch(err){
+    warn('Немає доступу до мікрофона: ' + (err.name || err.message));
+    return false;
+  }
+}
+
+async function safeStart(){
+  if (!SR) return;
+  wantListen = true;
+  setupRecognition();
+  if (running) { setUI(true); return; }
+  if (!secureOk) warn('Увага: сторінка не в захищеному контексті (HTTPS/localhost).');
+  const ok = await ensureMicPermission();
+  if (!ok){ wantListen = false; setUI(false); return; }
+  try{ rec.start(); }catch(e){ setTimeout(()=>{ try{ rec.start(); }catch(_){} }, 300); }
+}
+function safeStop(){ wantListen = false; if (rec){ try{ rec.stop(); }catch(_){} } setUI(false); }
+
+// --- UI
+startBtn.addEventListener('click', safeStart);
+
+            updateShiftButtons();
+            loadData();
+        });
+    </script>
 </body>
 </html>
