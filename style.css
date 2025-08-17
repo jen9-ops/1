@@ -1,0 +1,591 @@
+/* Основні стилі */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f2f5;
+    color: #333;
+    padding: 20px;
+}
+
+/* Контейнер */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 25px;
+    font-size: 2em;
+    font-weight: 600;
+}
+
+/* Управління */
+.main-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.main-controls button {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
+    background-color: #6c757d;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.main-controls button#start {
+    padding: 12px;
+    width: 50px;
+    height: 50px;
+    box-sizing: border-box;
+    background-color: #28a745;
+}
+
+.main-controls button i,
+.action-buttons button i,
+.action-buttons label i {
+    margin-right: 8px;
+}
+
+.main-controls button#start i {
+    margin: 0;
+}
+
+.main-controls button:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+}
+
+.main-controls button#start:hover {
+    background-color: #218838;
+}
+
+/* Анімація для мікрофона */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        color: white;
+    }
+    50% {
+        transform: scale(1.1);
+        color: #ff4d4d;
+    }
+    100% {
+        transform: scale(1);
+        color: white;
+    }
+}
+
+.main-controls button#start.listening .fa-microphone {
+    animation: pulse 1.5s infinite;
+}
+
+/* Стилі для індикаторів */
+.speech-indicators {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #9aa3b2;
+}
+
+.dot.live {
+    background: #e23a3a;
+    box-shadow: 0 0 0 4px rgba(226, 58, 58, 0.15);
+}
+
+.status {
+    font-size: 13px;
+    color: #333;
+}
+
+.warn {
+    margin-top: 8px;
+    font-size: 13px;
+    color: #b91c1c;
+}
+
+.ok {
+    color: #0b7a2a;
+}
+
+/* Статистика */
+.stats-block {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 25px;
+    font-size: 1.1em;
+    font-weight: 600;
+}
+
+.stats-block span {
+    color: #007bff;
+}
+
+/* Пошук */
+.search-control {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.search-control input {
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    width: 300px;
+    font-size: 16px;
+}
+
+/* Форма */
+#dataForm {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr) auto;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+#dataForm input {
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+.add-btn {
+    padding: 10px 15px;
+    background-color: #17a2b8;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.add-btn:hover {
+    background-color: #138496;
+    transform: scale(1.05);
+}
+
+/* Кнопки дій */
+.action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.action-buttons button, .action-buttons label {
+    padding: 10px 15px;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.action-buttons button.primary, .action-buttons label.primary {
+    background-color: #007bff;
+}
+.action-buttons button.primary:hover, .action-buttons label.primary:hover {
+    background-color: #0056b3;
+}
+.action-buttons button.danger {
+    background-color: #dc3545;
+}
+.action-buttons button.danger:hover {
+    background-color: #c82333;
+}
+.action-buttons button.warning {
+    background-color: #ffc107;
+    color: #212529;
+    font-weight: bold;
+}
+.action-buttons button.warning:hover {
+    background-color: #e0a800;
+}
+.action-buttons button.success {
+    background-color: #28a745;
+}
+.action-buttons button.success:hover {
+    background-color: #218838;
+}
+.action-buttons button.secondary {
+    background-color: #6c757d;
+}
+.action-buttons button.secondary:hover {
+    background-color: #5a6268;
+}
+
+button:disabled {
+    background-color: #ccc !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+}
+
+/* Нова ціль */
+#newTargetControl {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+#newTargetInput, #coordsInput {
+    padding: 8px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    width: 100%;
+    max-width: 300px;
+    box-sizing: border-box;
+}
+
+#newTargetInput::placeholder, #coordsInput::placeholder {
+    font-style: italic;
+}
+
+/* Таблиця */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 25px;
+}
+
+th, td {
+    border: 1px solid #e0e0e0;
+    padding: 15px;
+    text-align: left;
+}
+
+th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #495057;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9fa;
+}
+
+.highlight-yellow {
+    background-color: #fff3cd;
+}
+.highlight-orange {
+    background-color: #ffe4b2;
+}
+
+.section-divider {
+    border-top: 2px solid #007bff;
+    margin: 25px 0;
+    text-align: center;
+    position: relative;
+}
+
+.divider-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 0 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.divider-text, .divider-input {
+    color: #4a4a4a;
+    font-weight: bold;
+}
+
+.divider-input {
+    font-size: 1em;
+    width: auto;
+    text-align: center;
+    border: 1px solid #007bff;
+    border-radius: 4px;
+}
+
+.divider-coords {
+    font-size: 0.9em;
+    color: #555;
+    font-style: italic;
+}
+
+.shift-header {
+    text-align: center;
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #2c3e50;
+}
+
+.delete-btn {
+    background: none;
+    border: none;
+    color: #dc3545;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 10px;
+}
+
+/* Модальні вікна */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+    padding-top: 60px;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal .action-buttons {
+    flex-direction: column;
+    gap: 15px;
+}
+
+.modal .action-buttons button, .modal .action-buttons label {
+    width: 100%;
+}
+
+.modal .shift-control {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+.modal .shift-control button {
+    width: 48%;
+    background-color: #e9ecef;
+    color: #495057;
+}
+.modal .shift-control button.active {
+    background-color: #007bff;
+    color: white;
+}
+.modal .shift-control button:hover {
+    background-color: #dee2e6;
+}
+.modal .shift-control button.active:hover {
+    background-color: #0056b3;
+}
+
+/* Калькулятор */
+#calculatorModal .modal-content {
+    max-width: 300px;
+}
+.calc-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+    position: relative;
+}
+.calc-buttons {
+    display: flex;
+    justify-content: space-around;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+.calc-buttons button {
+    width: 100%;
+    padding: 15px;
+    font-size: 1.5em;
+    font-weight: bold;
+    background-color: #2c3e50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+#calcResult {
+    font-size: 2em;
+    font-weight: bold;
+    color: #007bff;
+}
+
+/* Випадаюче меню */
+.take-value-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    z-index: 10;
+    padding: 5px;
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+}
+.take-value-menu button {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    color: #333;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.take-value-menu button:hover {
+    background-color: #e0e0e0;
+}
+
+/* Кнопки запису результату */
+.write-back-buttons {
+    display: none;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+}
+.write-back-buttons button {
+    padding: 8px 12px;
+    font-size: 1em;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.write-back-buttons button:hover {
+    background-color: #0056b3;
+}
+
+/* Адаптивність */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+
+    #dataForm {
+        grid-template-columns: 1fr;
+    }
+
+    .action-buttons, .modal .action-buttons {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .action-buttons > div {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .action-buttons input,
+    .action-buttons button,
+    .action-buttons label {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    table, thead, tbody, th, td, tr {
+        display: block;
+    }
+
+    thead {
+        display: none;
+    }
+
+    tr {
+        border: 1px solid #e0e0e0;
+        margin-bottom: 15px;
+        display: block;
+        padding: 15px;
+        border-radius: 8px;
+        background-color: #fff;
+    }
+
+    td {
+        border: none;
+        position: relative;
+        padding-left: 50%;
+        text-align: right;
+    }
+
+    td:last-child {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+    }
+
+    td:before {
+        content: attr(data-label);
+        position: absolute;
+        left: 10px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+        text-align: left;
+        font-weight: bold;
+        color: #555;
+    }
+
+    .stats-block {
+        flex-direction: column;
+        gap: 10px;
+    }
+}

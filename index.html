@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Таблиця даних</title>
+    <link rel="icon" href="https://jen9-ops.github.io/Note/icon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Зв'язані файли для стилів і скриптів -->
+    <link rel="stylesheet" href="https://jen9-ops.github.io/library/style.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Таблиця даних</h1>
+        
+        <div class="main-controls">
+            <button id="start"><i class="fa-solid fa-microphone"></i></button>
+            <button id="calculatorBtn" class="secondary"><i class="fa-solid fa-calculator"></i> Калькулятор</button>
+            <button id="settingsBtn"><i class="fa-solid fa-gear"></i> Налаштування</button>
+            
+        </div>
+        
+        <div class="speech-indicators">
+            <div id="dot" class="dot" title="Індикатор запису"></div>
+            <span id="status" class="status">Не слухаю</span>
+        </div>
+        <div id="warn" class="warn"></div>
+        
+        <div class="stats-block">
+            <span>Загалом пострілів: <span id="totalShotsDisplay">0</span></span>
+            <span>Залишок б/к: <span id="remainingAmmoDisplay">0</span></span>
+        </div>
+        
+        <div class="search-control">
+            <input type="text" id="searchInput" placeholder="Пошук по номеру цілі...">
+        </div>
+        
+        <form id="dataForm">
+            <input type="text" id="riven" placeholder="Рівень" required>
+            <input type="text" id="dalnist" placeholder="Дальність" required>
+            <input type="text" id="kut" placeholder="Кут" required>
+            <button type="submit" class="add-btn">Додати дані</button>
+        </form>
+
+        <div class="action-buttons">
+            <div id="newTargetControl">
+                <input type="text" id="newTargetInput" placeholder="Введіть номер цілі">
+                <input type="text" id="coordsInput" value="37U DQ " placeholder="Введіть координати">
+                <button id="newTargetBtn" class="primary"><i class="fa-solid fa-plus"></i> Нова ціль</button>
+            </div>
+            <button id="shotBtn" class="warning"><i class="fa-solid fa-forward"></i> Один вперед</button>
+            <button id="undoShotBtn" class="danger"><i class="fa-solid fa-rotate-left"></i> Відмінити останній постріл</button>
+        </div>
+        
+        <div id="table-container">
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th>Рівень</th>
+                        <th>Дальність</th>
+                        <th>Кут</th>
+                        <th>Кількість пострілів</th>
+                        <th>Залишок б/к</th>
+                        <th>Час пострілу</th>
+                        <th>Час між пострілами</th>
+                        <th>Дії</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Налаштування</h2>
+            <div class="shift-control">
+                <button id="chesterShiftBtn">Честер</button>
+                <button id="kozakShiftBtn">Козак</button>
+            </div>
+            <div class="action-buttons">
+                <div id="ammoControl">
+                    <label for="ammoInput">Встановити б/к:</label>
+                    <input type="number" id="ammoInput" placeholder="Кількість б/к" min="0">
+                    <button id="setAmmoBtn" class="success"><i class="fa-solid fa-circle-check"></i> Встановити</button>
+                </div>
+                <button id="downloadBtn" class="success"><i class="fa-solid fa-download"></i> Зберегти дані (JSON)</button>
+                <button id="downloadZipBtn" class="success"><i class="fa-solid fa-file-zipper"></i> Зберегти як ZIP</button>
+                <button id="downloadPdfBtn" class="success"><i class="fa-solid fa-file-pdf"></i> Зберегти в PDF</button>
+                <label id="uploadLabel" class="secondary" for="uploadInput"><i class="fa-solid fa-upload"></i> Відкрити файл</label>
+                <input type="file" id="uploadInput" accept=".json,.zip" style="display: none;">
+                <button id="clearAllDataBtn" class="danger"><i class="fa-solid fa-trash-can"></i> Видалити всі дані</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="calculatorModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeCalcBtn">&times;</span>
+            <h2>Калькулятор</h2>
+            <div class="calc-inputs">
+                <input type="number" id="calcInput1" placeholder="Перше число">
+                <input type="number" id="calcInput2" placeholder="Друге число">
+                <div class="take-value-menu" id="takeValueMenu">
+                    <button id="takeRivenBtn">Взяти Рівень</button>
+                    <button id="takeDalnistBtn">Взяти Дальність</button>
+                    <button id="takeKutBtn">Взяти Кут</button>
+                </div>
+            </div>
+            <div class="calc-buttons">
+                <button id="calcAddBtn">+</button>
+                <button id="calcSubtractBtn">-</button>
+            </div>
+            <h3>Результат: <span id="calcResult">0</span></h3>
+            <div class="write-back-buttons" id="writeBackButtons">
+                <span>Записати результат в:</span>
+                <button id="writeToRivenBtn">Рівень</button>
+                <button id="writeToDalnistBtn">Дальність</button>
+                <button id="writeToKutBtn">Кут</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Підключення зовнішніх бібліотек і скриптів -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://jen9-ops.github.io/library/script.js"></script>
+    <script type="module" src="voice.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
